@@ -66,6 +66,15 @@ python3 -I tools/pstdump.py /tmp/sample.pst | tail -1
 pffexport -q -m all -t /tmp/sample /tmp/sample.pst
 ```
 
+## Releasing
+
+`.github/workflows/release.yml` builds the binaries (static musl on Linux,
+universal on macOS, static CRT on Windows) and runs them on the sample
+fixtures. To release, set the version in `Cargo.toml`, commit, and push a tag
+`v<version>`; the workflow refuses a tag that does not match `Cargo.toml` and
+publishes the archives and `SHA256SUMS` as a GitHub release. Run it by hand
+(workflow_dispatch) to build without publishing.
+
 ## Format facts worth knowing
 
 - Outlook grows files one AMap region (253,952 bytes) at a time; `ibFileEof` is

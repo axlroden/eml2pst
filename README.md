@@ -3,13 +3,22 @@
 Convert `.eml` email files into an Outlook PST file. Runs on macOS, Linux and
 Windows; Outlook is not needed.
 
-## Build
+## Install
+
+Download the archive for your system from the GitHub releases page, unpack it
+and put `eml2pst` (`eml2pst.exe` on Windows) somewhere on your `PATH`. There
+are builds for Linux (x86_64, aarch64; static, any distribution), macOS (one
+binary for Apple silicon and Intel) and Windows (x86_64, arm64).
+
+On macOS, a binary downloaded with a browser is blocked until you clear its
+quarantine flag:
 
 ```bash
-cargo build --release
+xattr -d com.apple.quarantine eml2pst
 ```
 
-The binary is `target/release/eml2pst`.
+Or build it yourself with `cargo build --release`; the binary is
+`target/release/eml2pst`.
 
 ## Convert
 

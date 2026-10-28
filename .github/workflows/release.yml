@@ -1,0 +1,125 @@
+name: Release
+
+# Builds the eml2pst binary for Linux, macOS and Windows and, on a version tag
+# (v0.1.0), publishes the archives as a GitHub release. Manual runs and pull
+# requests that change this file only build; the archives are kept as workflow
+# artifacts.
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    paths: [.github/workflows/release.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x86_64
+            runner: ubuntu-24.04
+            target: x86_64-unknown-linux-musl
+          - name: linux-aarch64
+            runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+          - name: macos-universal
+            runner: macos-15
+            target: aarch64-apple-darwin,x86_64-apple-darwin
+          - name: windows-x86_64
+            runner: windows-latest
+            target: x86_64-pc-windows-msvc
+          - name: windows-aarch64
+            runner: windows-latest
+            target: aarch64-pc-windows-msvc
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      # Link the C runtime statically, so the .exe runs without the Visual C++
+      # redistributable.
+      RUSTFLAGS: ${{ contains(matrix.target, 'windows') && '-C target-feature=+crt-static' || '' }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - name: Build
+        run: |
+          for target in ${TARGETS//,/ }; do
+            # The oldest macOS the Intel build supports; arm64 starts at 11.
+            if [ "$target" = x86_64-apple-darwin ]; then export MACOSX_DEPLOYMENT_TARGET=10.13; fi
+            cargo build --release --locked --target "$target"
+          done
+        env:
+          TARGETS: ${{ matrix.target }}
+      - name: Package
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"$/\1/p' Cargo.toml | head -1)
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match version $version in Cargo.toml"
+            exit 1
+          fi
+          name=eml2pst-$version-${{ matrix.name }}
+          mkdir dist "$name"
+          cp README.md LICENSE "$name/"
+          case "${{ matrix.name }}" in
+            macos-*)
+              lipo -create -output "$name/eml2pst" target/*-apple-darwin/release/eml2pst
+              lipo "$name/eml2pst" -verify_arch arm64 x86_64
+              bin=$name/eml2pst
+              ;;
+            windows-*)
+              cp "target/${{ matrix.target }}/release/eml2pst.exe" "$name/"
+              bin=$name/eml2pst.exe
+              ;;
+            linux-*)
+              cp "target/${{ matrix.target }}/release/eml2pst" "$name/"
+              file "$name/eml2pst" | grep -E 'statically linked|static-pie linked'
+              bin=$name/eml2pst
+              ;;
+          esac
+          case "${{ matrix.name }}" in
+            windows-*) 7z a -tzip "dist/$name.zip" "$name" ;;
+            *) tar czf "dist/$name.tar.gz" "$name" ;;
+          esac
+          echo "BIN=$bin" >>"$GITHUB_ENV"
+      - name: Run it
+        # The Windows arm64 build cannot run on the x64 runner.
+        if: matrix.name != 'windows-aarch64'
+        run: |
+          "$BIN" --version
+          "$BIN" -o sample.pst tests/fixtures/sample
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.name }}
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - run: cd dist && sha256sum -- * >SHA256SUMS
+      - run: >
+          gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY"
+          --title "eml2pst ${GITHUB_REF_NAME#v}" --generate-notes --verify-tag
+        env:
+          GH_TOKEN: ${{ github.token }}
