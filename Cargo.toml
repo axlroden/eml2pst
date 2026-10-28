@@ -1,0 +1,22 @@
+[package]
+name = "eml2pst"
+version = "0.1.0"
+edition = "2024"
+description = "Convert .eml email files into Outlook PST files"
+license = "AGPL-3.0-only"
+keywords = ["pst", "outlook", "eml", "email", "mapi"]
+categories = ["command-line-utilities", "email", "encoding"]
+
+[dependencies]
+clap = { version = "4.6.7", features = ["derive"] }
+codepage = "0.1.3"
+encoding_rs = "0.8.42"
+mail-parser = { version = "1.0.0", features = ["full_encoding"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+uuid = { version = "1.29.0", features = ["v4"] }
+zip = "9.1.3"
+
+[dev-dependencies]
+outlook-pst = "1.2.0"
+tempfile = "3.27.0"

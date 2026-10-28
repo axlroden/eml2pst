@@ -1,0 +1,29 @@
+From: =?UTF-8?B?SsO2cmc=?= <joerg@example.de>
+To: Ann Example <ann@example.com>
+Subject: =?UTF-8?Q?RE:_Gr=C3=BC=C3=9Fe_aus_M=C3=BCnchen?=
+Date: Wed, 2 Jul 2025 08:30:00 +0000
+Message-ID: <html-2@example.de>
+In-Reply-To: <plain-1@example.com>
+References: <plain-1@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="outer"
+
+--outer
+Content-Type: multipart/alternative; boundary="alt"
+
+--alt
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Hallo Ann, Gr=C3=BC=C3=9Fe!
+--alt
+Content-Type: text/html; charset=utf-8
+
+<html><body><p>Hallo Ann, <b>Grüße</b>!</p></body></html>
+--alt--
+--outer
+Content-Type: text/plain; name="notes.txt"
+Content-Disposition: attachment; filename="notes.txt"
+
+Some attached notes.
+--outer--

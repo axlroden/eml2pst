@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+
+  validate:
+    # Cross-checks a generated PST with libpff and the bundled validator.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: sudo apt-get update && sudo apt-get install -y pff-tools
+      - run: cargo run -q -- -o sample.pst --folder "" tests/fixtures/sample
+      - run: python3 -I tools/pstdump.py sample.pst > pstdump.txt || (tail -5 pstdump.txt; exit 1)
+      - run: pffinfo sample.pst
+      - run: pffexport -q -m all -t sample sample.pst
+      - run: test "$(find sample.export -name Message.txt -not -path '*Attachments*' | wc -l)" -eq 5

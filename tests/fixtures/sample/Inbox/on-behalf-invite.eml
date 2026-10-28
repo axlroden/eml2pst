@@ -1,0 +1,22 @@
+From: Jerry <jerry@datadirect.example>
+Sender: jerry=datadirect.example@email.datadirect.example
+To: Mike <mike@example.com>
+Subject: Mike S 
+Date: Fri, 4 Jul 2025 09:00:00 +0000
+Message-ID: <invite-4@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="m"
+
+--m
+Content-Type: text/plain; charset=us-ascii
+
+See invite.
+--m
+Content-Type: text/calendar; method=REQUEST; charset=utf-8
+Content-Disposition: attachment
+
+BEGIN:VCALENDAR
+VERSION:2.0
+METHOD:REQUEST
+END:VCALENDAR
+--m--

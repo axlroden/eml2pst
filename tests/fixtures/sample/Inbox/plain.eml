@@ -1,0 +1,12 @@
+From: Ann Example <ann@example.com>
+To: Bob Builder <bob@example.com>, carol@example.com
+Cc: Dan <dan@example.com>
+Subject: Hello from eml2pst
+Date: Tue, 1 Jul 2025 10:00:00 +0200
+Message-ID: <plain-1@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+Hi Bob,
+
+This is a plain text message.
