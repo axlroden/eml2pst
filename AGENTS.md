@@ -93,7 +93,11 @@ pffexport -q -m all -t /tmp/sample /tmp/sample.pst
 - Bytes to compare against Outlook: the TZDEFINITION and global object ID unit
   tests in `recurrence.rs` and `meeting.rs` hold values taken from an
   Outlook-generated meeting response.
-- Not yet verified in Outlook or `scanpst.exe`; treat that as the open risk on
-  every format change.
+- Verified by importing into New Outlook for Mac (File > Import; its file
+  picker needs a person to click). The importer keeps each item as an `.eml`
+  under `~/Library/Group Containers/UBF8T346G9.Office/Outlook/Outlook 15
+  Profiles/Main Profile/Omc/`, which shows exactly what it read. Not yet
+  verified in Outlook for Windows or `scanpst.exe`; treat that as the open risk
+  on every format change.
 
 [MS-PST]: https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-pst/141923d5-15ab-4ef1-a524-6dce75aae546
