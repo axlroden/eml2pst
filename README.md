@@ -5,10 +5,11 @@ Windows; Outlook is not needed.
 
 ## Install
 
-Download the archive for your system from the GitHub releases page, unpack it
-and put `eml2pst` (`eml2pst.exe` on Windows) somewhere on your `PATH`. There
-are builds for Linux (x86_64, aarch64; static, any distribution), macOS (one
-binary for Apple silicon and Intel) and Windows (x86_64, arm64).
+Download the archive for your system from the
+[releases page](https://github.com/axlroden/eml2pst/releases), unpack it and
+put `eml2pst` (`eml2pst.exe` on Windows) somewhere on your `PATH`. There are
+builds for Linux (x86_64, aarch64; static, any distribution), macOS (one binary
+for Apple silicon and Intel) and Windows (x86_64, arm64).
 
 On macOS, a binary downloaded with a browser is blocked until you clear its
 quarantine flag:
